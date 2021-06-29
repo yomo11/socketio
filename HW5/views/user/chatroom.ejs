@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/js/sweetalert.js"></script>
+    <title>Hw5: chat room </title>
+    <link rel="stylesheet" href="/css/chatroom.css" />
+</head>
+
+<body>
+
+    <!-- register page -->
+
+    <div id="login_page">
+        <div class="container">
+            <div class="loginHeader">
+                <div><strong>Hello <%= name  %></strong></div>
+            </div>
+            <div class="list-group" style='width:50%; text-align:left;'>
+                <li class="list-group-item list-group-item-action">Your friend list:</li>
+
+                <%for (let i = 0; i < friendlist.length; i++){ %>
+                <a href='chatbox?fr=<%=friendlist[i]%>'
+                    class="list-group-item list-group-item-action list-group-item-info">
+                    <img src="/img/userImg.png" alt="Your Picture" style="border-radius: 50%;" width="30" height="30">
+                    <strong><%=friendlist[i]%></strong>
+                </a>
+                <%}%>
+
+            </div>
+
+            <form method="post">
+                <input type="submit" class="btn btn-secondary" value="make some friends" name="makeFriend_Btn">
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/js/sweetalert.js"></script>
+    <title>Hw5: chat room </title>
+    <link rel="stylesheet" href="/css/chatroom.css" />
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+</head>
+
+<body>
+
+    <!-- register page -->
+
+    <div id="login_page">
+        <div class="container">
+            <div class="loginHeader" style='margin-bottom: 20px;'>
+                <div><strong><%= name  %> chat with <%= friend %></strong></div>
+                <input type="button" class="btn btn-info" value="Go back to the friend list" name="makeFriend_Btn"
+                    onclick="window.location='./chatroom'">
+            </div>
+
+            <div class="overflow-auto" style='width:40%; height:380px; border:groove  2px #ffffff9c;'>
+                <!-- <div class="p-3 mb-2 bg-primary text-white">.bg-primary</div> -->
+                <div id='showdata' style='height:340px; overflow-y: auto;'>
+                    <% for(let i = 0; i < contents.length; i++) { %>
+                    <div>
+                        <% if(contents[i].name == 'me'){ %>
+                        <div class="list-group-item list-group-item-action list-group-item-info"
+                            style="width:60%; text-align:left; margin-bottom: 10px; margin-left: auto;">
+                            <div><%= contents[i].msg %></div>
+                            <div><%= contents[i].date %></div>
+                            <% } else { %>
+                            <div class="list-group-item list-group-item-action list-group-item-basic"
+                                style="width:60%; text-align:left; margin-bottom: 10px;">
+                                <img src="/img/userImg.png" alt="Your Picture" style="border-radius: 50%;" width="20"
+                                    height="20">
+                                <strong><%= contents[i].name %></strong>
+                                <div><%= contents[i].msg %></div>
+                                <div><%= contents[i].date %></div>
+                                <% } %>
+                            </div>
+                        </div>
+                        <% } %>
+                    </div>
+
+                    <form id="msgForm" method='post'>
+                        <div class="input-group mb-3">
+                            <input type="text" id="msgText" name="msgInput" class="form-control" placeholder="Aa"
+                                aria-describedby="basic-addon2">
+                            <div class="input-group-btn">
+                                <button id='sendchatBtn' class="btn btn-info" style="border-radius: 50%;" type="submit"
+                                    value="Go"><i class="fas fa-paper-plane"></i>
+                            </div>
+                        </div>
+                    </form>
+
+
+                </div>
+
+
+            </div>
+        </div>
+        <script>
+            $(document).ready(function () {
+                var objDiv = document.getElementById("showdata");
+                objDiv.scrollTop = objDiv.scrollHeight;
+                console.log('hi');
+
+                let username = '<%= name %>'
+                let connected = 0;
+                let newFriend = '<%= friend %>';
+
+                var socket = io.connect('http://localhost:3000');
+                let time = new Date().toLocaleString();
+
+                socket.on('message', function (data) {
+                    console.log(data.text);
+                })
+
+
+                $('#msgForm').submit(async function () {
+                    time = new Date().toLocaleString();
+                    console.log(time);
+                    let msg = $('#msgText').val();
+                    $('#showdata').append('<div class="list-group-item list-group-item-info" style="width:60%; text-align:left; margin-bottom: 10px; margin-left: auto;"><div>' + msg + '</div><div>' + time + '</div></div>');
+                    await socket.emit('sent_chat', { 'username': username, 'newFriend': newFriend, 'msg': msg, 'time': time });
+                    return true;
+                });
+
+
+                socket.on('get_chat', function (data) {
+                    if (data.newFriend == username) {
+                        $('#showdata').append('<div class="list-group-item list-group-item-basic" style="width:60%; text-align:left; margin-bottom: 10px;"><strong>' + data.username + '</strong><div>' + data.msg + '</div><div>' + data.time + '</div></div>');
+                        objDiv.scrollTop = objDiv.scrollHeight;
+                    }
+                });
+
+            })
+
+
+
+        </script>
+        <script src="https://kit.fontawesome.com/6824469881.js" crossorigin="anonymous"></script>
+</body>
+
+
+</html>

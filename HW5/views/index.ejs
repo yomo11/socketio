@@ -1,0 +1,95 @@
+<!--建立socketio client -->
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="//code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript">
+    var msg = "<%= msg %>";
+    var socket = io();
+    $(document).ready(function () {
+
+        socket.on('connect', function (data) {
+
+            console.log('User connected.');
+            //console.log(msg);
+            socket.on('disconnect', function () {
+                console.log('User disconnected.');
+            });
+
+        })
+
+    })
+</script>
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <!-- <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-database.js" defer></script> -->
+
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/js/sweetalert.js"></script>
+    <title>Hw5: chat site </title>
+    <link rel="stylesheet" href="/css/login.css" />
+</head>
+
+<body>
+    <!-- login page -->
+
+    <div id="login_page">
+        <div class="container">
+            <div class="loginHeader">
+                <div id="loginBtn" value="Login" name="loginhBtn">Login</div>
+            </div>
+            <hr size="1px" width="50%" color="#CFCFCF">
+            <form id="loginForm" style='Background:white;' method="post">
+                <div class="userPwd">
+                    <input type="text" id="email" class="form-control me-2" name="email"
+                        style="margin-top: 20px; border-style: solid;" placeholder="Email" />
+                    <input type="password" id="pwdtext" class="form-control me-2" name="password"
+                        style="margin-top: 20px; border-style: solid;" placeholder="Password" />
+                </div>
+                <hr size="1px" width="50%" color="#CFCFCF">
+                <div class="showdata"><%= msg  %></div>
+                <div><a href='/user/register'>No account? please click here.</a></div>
+                <input type="submit" id="log_inBtn" class="btn btn-outline-success" value="LOG IN" name="login_hBtn"
+                    style="background-color:transparent;
+    border: 0;">
+            </form>
+
+        </div>
+    </div>
+    <script>
+        let swal = '<%= swal  %>';
+        console.log(swal);
+        if (swal != 'none') {
+            let icon = '<%= icon  %>';
+            let msg = '<%= msg  %>';
+            let titleMsg = '<%= titleMsg  %>';
+            if (icon == 'success') {
+                Swal.fire(
+                    titleMsg,
+                    msg,
+                    icon
+                ).then(function () {
+                    window.location = '/user/chatroom';
+                });
+            }
+            else {
+                Swal.fire(
+                    titleMsg,
+                    msg,
+                    icon
+                )
+            }
+        }
+
+    </script>
+
+
+</body>
+
+</html>

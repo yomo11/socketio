@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <!-- <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-database.js" defer></script> -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/js/sweetalert.js"></script>
+    <!-- <script src="/js/script.js" defer></script> -->
+    <!-- <script src="/js/login.js" defer></script> -->
+    <title>Hw5: chat site <%= title  %> </title>
+    <link rel="stylesheet" href="/css/login.css" />
+</head>
+
+<body>
+
+    <!-- register page -->
+
+    <div id="login_page">
+        <div class="container">
+            <div class="loginHeader">
+                <div id="regBtn" value="Register" name="regBtn">Register</div>
+            </div>
+            <hr size="1px" width="50%" color="#CFCFCF">
+            <form name="regForm" style='Background:white;' method="POST">
+                <div class="userPwd">
+                    <input type="text" id="usertext2" class="form-control me-2" name="username"
+                        style="margin-top: 20px; border-style: solid;" placeholder="Username" />
+                    <input type="text" id="email2" class="form-control me-2" name="email"
+                        style="margin-top: 20px; border-style: solid;" placeholder="Email" />
+                    <input type="password" id="pwdtext2" class="form-control me-2" name="password"
+                        style="margin-top: 20px; border-style: solid;" placeholder="Password" />
+                    <input type="password" id="pwdconfirm" name="confirm_password" class="form-control me-2"
+                        style="margin-top: 20px; border-style: solid;" placeholder="Retype Password" />
+                </div>
+                <hr size="1px" width="50%" color="#CFCFCF">
+                <div class="showdata" style="color: crimson;"><%= msg  %></div>
+                <div><a href='/'>Already have account? please click here.</a></div>
+                <input type="submit" id="reg_Btn" class="btn btn-outline-success" value="REGISTER NOW" name="reg_Btn"
+                    onclick="/*registerUser()*/">
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+        let swal = '<%= swal  %>';
+        console.log(swal);
+        if (swal != 'none') {
+            let icon = '<%= icon  %>';
+            let msg = '<%= msg  %>';
+            let titleMsg = '<%= titleMsg  %>';
+            if (icon == 'success') {
+                Swal.fire(
+                    titleMsg,
+                    msg,
+                    icon
+                ).then(function () {
+                    window.location = '/';
+                });
+            }
+            else {
+                Swal.fire(
+                    titleMsg,
+                    msg,
+                    icon
+                )
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/js/sweetalert.js"></script>
+    <title>Hw5: new friend!! </title>
+    <link rel="stylesheet" href="/css/chatroom.css" />
+    <script src="https://kit.fontawesome.com/6824469881.js" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+</head>
+
+<body>
+
+
+    <div id="login_page">
+        <div class="container">
+            <div class="loginHeader" style='margin-bottom: 20px;'>
+                <div><strong>Hello <%= username  %></strong></div>
+                <input type="button" class="btn btn-info" value="Go back to the friend list" name="makeFriend_Btn"
+                    onclick="window.location='./chatroom'">
+            </div>
+            <div class="btn-group">
+                <button type="button" id="rematchBtn" class="btn btn-default">Rematch</button>
+                <button type="button" id="inviteBtn" class="btn btn-default">Send a friend
+                    invitation</button>
+            </div>
+
+            <div class="overflow-auto" style='width:40%; height:380px; border:groove  2px #ffffff9c;'>
+
+                <div id='showdata' style='height:340px; overflow-y: auto;'></div>
+
+
+
+                <form id="msgForm" method='post'>
+                    <div class="input-group mb-3">
+                        <input type="text" id="msgInput" name="msgInput" class="form-control" placeholder="Aa"
+                            aria-describedby="basic-addon2">
+                        <div class="input-group-btn">
+                            <button id='sendchatBtn' class="btn btn-info" style="border-radius: 50%;" type="button"
+                                value="Go"><i class="fas fa-paper-plane"></i>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+
+
+        </div>
+    </div>
+
+    <script>
+
+        let username = '<%= username %>'
+        let friends = [];
+        friends = '<%= friendlist %>';
+        console.log(friends);
+        let connected = 0;
+        let newFriend = '';
+        let invite_friend = 0;
+
+        var socket = io.connect('http://localhost:3000');
+        let time = new Date().toLocaleString();
+        //send msg to server
+        socket.emit('client_data', { 'username': username });
+        $('#showdata').append("<strong>pairing in progress...</strong>");
+        $('#showdata').append('<div>' + time + '</div>');
+
+        //get msg from server
+        socket.on('message', function (data) {
+            console.log(data.text);
+        })
+
+        socket.on('new_user', function (data) {
+            busyList = data.busyList;
+            console.log('broadcast: ' + data.newuser);
+            console.log('busyList: ' + busyList);
+            if (busyList.indexOf(data.newuser) == -1) console.log('not matched');
+            if (data.newuser != username && friends.indexOf(data.newuser) == -1 && busyList.indexOf(data.newuser) == -1) {
+                console.log('new friend: ' + data.newuser);
+                socket.emit('connect_new_friend', { 'username': username, 'new_friend': data.newuser });
+            }
+        })
+
+
+        socket.on('who_connect_new_friend', function (data) {
+            console.log(data.userA, data.userB);
+
+            if (connected == 0 && busyList.indexOf(data.userA) == -1 && busyList.indexOf(data.userB) == -1) {
+                connected = 1;
+                if (data.userA == username || data.userB == username) {
+                    if (data.userA == username) newFriend = data.userB;
+                    if (data.userB == username) newFriend = data.userA;
+                    $('#showdata').html('<strong>' + newFriend + ' has joined the room!!</strong>');
+                    $('#showdata').append('<div>' + time + '</div>');
+
+                    //send button
+                    $('#sendchatBtn').click(function () {
+                        let msg = $('#msgInput').val();
+                        $('#msgInput').val('');
+                        time = new Date().toLocaleString();
+                        $('#showdata').append('<div class="list-group-item list-group-item-info" style="width:60%; text-align:left; margin-bottom: 10px; margin-left: auto;"><div>' + msg + '</div><div>' + time + '</div></div>');
+                        socket.emit('sent_chat', { 'username': username, 'newFriend': newFriend, 'msg': msg, 'time': time });
+                    });
+                }
+            }
+        })
+        socket.on('get_chat', function (data) {
+            console.log(data);
+            if (data.newFriend == username) {
+                $('#showdata').append('<div class="list-group-item list-group-item-basic" style="width:60%; text-align:left; margin-bottom: 10px;"><strong>' + data.username + '</strong><div>' + data.msg + '</div><div>' + data.time + '</div></div>');
+
+            }
+        });
+
+        //reamtch button
+        $('#rematchBtn').click(function () {
+            socket.emit('rematch_req', { 'username': username, 'newFriend': newFriend });
+        });
+
+        socket.on('rematch_res', function (data) {
+            //console.log(data);
+            if (data.newFriend == username || data.username == username)
+                window.location.reload();
+        });
+
+        //invitation
+        $('#inviteBtn').click(async function () {
+            invite_friend = 1;
+            $('#showdata').append('<div class="list-group-item list-group-item-info" style="width:60%; text-align:left; margin-bottom: 10px; margin-left: auto;"><div>You are inviting ' + newFriend + ' to be your friend.</div><div>' + time + '</div></div>');
+            await socket.emit('sent_chat', { 'username': username, 'newFriend': newFriend, 'msg': username + ' is inviting you as a friend. ', 'time': time });
+            socket.emit('invite_friend', { 'username': username, 'newFriend': newFriend });
+
+        });
+
+        socket.on('get_invite', function (data) {
+            //console.log(data);
+            if (invite_friend == 1 && data.newFriend == username) {
+                $('#showdata').append('<div class="list-group-item list-group-item-basic" style="width:60%; text-align:left; margin-bottom: 10px;"><strong>System:</strong><div>Congratulations on becoming friends</div><div>' + data.time + '</div></div>');
+                socket.emit('succes_make_friend', { 'username': username, 'newFriend': newFriend });
+                invite_friend = 0;
+            }
+
+        });
+
+
+    </script>
+
+
+</body>
+
+
+</html>
